@@ -9,25 +9,25 @@ import {
   Chip
 } from '@mui/material';
 import { Favorite, ChatBubbleOutline, Visibility, PlayArrow } from '@mui/icons-material';
-import { mockContentPosts, mockReelData, mockPostAnalytics } from '../data/mockData';
+import { mockPostAnalytics } from '../data/mockData';
 import PostAnalytics from './PostAnalytics';
 import { ContentPost, ReelData } from '../types/dashboard';
 
 interface ContentFeedProps {
   activeTab: number;
+  posts: ContentPost[];
+  reels: ReelData[];
 }
 
-const ContentFeed: React.FC<ContentFeedProps> = ({ activeTab }) => {
+const ContentFeed: React.FC<ContentFeedProps> = ({ activeTab, posts, reels }) => {
   const [selectedItem, setSelectedItem] = useState<ContentPost | ReelData | null>(null);
 
-  const posts = activeTab === 0 ? mockContentPosts : [];
-  const reels = activeTab === 1 ? mockReelData : [];
-  const content = [...posts, ...reels];
+  const content = activeTab === 0 ? posts : reels;
 
   return (
     selectedItem ? (
       <PostAnalytics 
-        analytics={mockPostAnalytics[selectedItem.id]} 
+        analytics={mockPostAnalytics[selectedItem.id] || mockPostAnalytics["1"]} 
         content={selectedItem} 
         onClose={() => setSelectedItem(null)}
         onPrev={() => {
@@ -54,6 +54,8 @@ const ContentFeed: React.FC<ContentFeedProps> = ({ activeTab }) => {
                   className="glass-card-light"
                   sx={{ 
                     position: 'relative',
+                    width: 240,
+                    height: 240,
                     bgcolor: 'transparent', // Override with glass effect
                     boxShadow: 'none', // Override with glass effect
                     borderRadius: 2,
@@ -68,12 +70,13 @@ const ContentFeed: React.FC<ContentFeedProps> = ({ activeTab }) => {
                 >
                   <CardMedia
                     component="img"
-                    height="200"
                     image={isReel ? item.thumbnail : item.image}
                     alt={item.title}
                     sx={{ 
-                      borderRadius: 2,
-                      objectFit: 'cover'
+                      width: '100%',
+                      height: '100%',
+                      objectFit: 'contain',
+                      borderRadius: 2
                     }}
                   />
                   
@@ -180,7 +183,7 @@ const ContentFeed: React.FC<ContentFeedProps> = ({ activeTab }) => {
                           fontSize: '0.7rem'
                         }}
                       >
-                        {item.title}
+                        {item.caption || item.title}
                       </Typography>
                       
                       <Box sx={{ display: 'flex', gap: 1.5, alignItems: 'center' }}>

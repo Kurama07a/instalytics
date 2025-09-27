@@ -10,18 +10,15 @@ from typing import Dict, Any
 # optional import — will error early if not installed
 import jmespath
 
-client = httpx.Client(
-    headers={
-        # this is internal ID of an Instagram backend app. It doesn't change often.
-        "x-ig-app-id": "936619743392459",
-        # use browser-like features
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/62.0.3202.94 Safari/537.36",
-        "Accept-Language": "en-US,en;q=0.9,ru;q=0.8",
-        "Accept-Encoding": "gzip, deflate, br",
-        "Accept": "*/*",
-    },
-    timeout=10.0,
-)
+def load_cookies(cookies_file: str) -> dict:
+    """Load cookies from a JSON file."""
+    try:
+        with open(cookies_file, 'r') as f:
+            cookies = json.load(f)
+        return cookies
+    except Exception as e:
+        logger.error("Failed to load cookies from %s: %s", cookies_file, e)
+        return {}
 
 def setup_logger(name="tut1", log_file: str | None = None, level=logging.INFO):
     logger = logging.getLogger(name)
@@ -48,8 +45,23 @@ def setup_logger(name="tut1", log_file: str | None = None, level=logging.INFO):
 
 logger = setup_logger()
 
-def scrape_user(username: str, attempts: int = 3, backoff: float = 1.0):
+def scrape_user(username: str, attempts: int = 3, backoff: float = 1.0, cookies: dict = None):
     """Scrape Instagram user's data. Returns a dict on success."""
+    client_kwargs = {
+        "headers": {
+            # this is internal ID of an Instagram backend app. It doesn't change often.
+            "x-ig-app-id": "936619743392459",
+            # use browser-like features
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/62.0.3202.94 Safari/537.36",
+            "Accept-Language": "en-US,en;q=0.9,ru;q=0.8",
+            "Accept-Encoding": "gzip, deflate, br",
+            "Accept": "*/*",
+        },
+        "timeout": 10.0,
+    }
+    if cookies:
+        client_kwargs["cookies"] = cookies
+    client = httpx.Client(**client_kwargs)
     url = f"https://i.instagram.com/api/v1/users/web_profile_info/?username={username}"
     last_exc = None
     for attempt in range(1, attempts + 1):
@@ -180,14 +192,19 @@ if __name__ == "__main__":
     parser.add_argument("--no-pretty", action="store_true", help="Disable pretty JSON formatting")
     parser.add_argument("--attempts", type=int, default=3, help="Number of attempts on failure")
     parser.add_argument("--no-parse", action="store_true", help="Skip jmespath parsing and save raw scraped JSON")
+    parser.add_argument("--cookies-file", help="Path to JSON file containing cookies for authentication")
     args = parser.parse_args()
 
     # reconfigure logger if user requested a log file
     if args.log_file:
         logger = setup_logger(log_file=args.log_file)
 
+    cookies = None
+    if args.cookies_file:
+        cookies = load_cookies(args.cookies_file)
+
     try:
-        user_data = scrape_user(args.username, attempts=args.attempts)
+        user_data = scrape_user(args.username, attempts=args.attempts, cookies=cookies)
     except Exception as e:
         logger.exception("Failed to scrape user: %s", e)
         sys.exit(1)

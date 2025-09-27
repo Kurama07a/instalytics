@@ -7,9 +7,9 @@ import {
   CardContent
 } from '@mui/material';
 import { Favorite, ChatBubbleOutline } from '@mui/icons-material';
-import { mockMetrics } from '../data/mockData';
+import { MetricCard } from '../types/dashboard';
 
-const KeyMetrics: React.FC = () => {
+const KeyMetrics: React.FC<{ metrics: MetricCard[] }> = ({ metrics }) => {
   return (
     <Box>
       <Typography 
@@ -25,7 +25,7 @@ const KeyMetrics: React.FC = () => {
       </Typography>
       
       <Grid container spacing={2}>
-        {mockMetrics.map((metric, index) => (
+        {metrics.map((metric, index) => (
           <Grid item xs={12} sm={4} key={index}>
             <Card className="glass-card" sx={{ 
               bgcolor: 'transparent', // Override with glass effect

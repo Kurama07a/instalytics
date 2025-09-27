@@ -1,5 +1,4 @@
-
-import React from 'react';
+import React, { useState } from 'react';
 import { 
   Box, 
   Typography, 
@@ -10,7 +9,16 @@ import {
 } from '@mui/material';
 import { Search, Notifications, Settings, AccountCircle } from '@mui/icons-material';
 
-const Header: React.FC = () => {
+const Header: React.FC<{ onSearch?: (username: string) => void }> = ({ onSearch }) => {
+  const [searchValue, setSearchValue] = useState('');
+
+  const handleKeyPress = (event: React.KeyboardEvent) => {
+    if (event.key === 'Enter' && onSearch) {
+      onSearch(searchValue.trim());
+      setSearchValue('');
+    }
+  };
+
   return (
     <AppBar position="fixed" className="glass-header" sx={{ 
       bgcolor: 'transparent', // Override with glass effect
@@ -34,8 +42,11 @@ const Header: React.FC = () => {
         }}>
           <Search sx={{ color: '#CCCCCC', mr: 1 }} />
           <InputBase
-            placeholder="Search..."
+            placeholder="Search Instagram username..."
             sx={{ color: '#FFFFFF', flex: 1 }}
+            value={searchValue}
+            onChange={(e) => setSearchValue(e.target.value)}
+            onKeyPress={handleKeyPress}
           />
         </Box>
         

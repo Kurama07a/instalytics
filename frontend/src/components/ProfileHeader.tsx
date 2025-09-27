@@ -8,11 +8,10 @@ import {
 } from '@mui/material';
 import { Verified } from '@mui/icons-material';
 import { mockUserProfile } from '../data/mockData';
-
+import { UserProfile } from '../types/dashboard';
 // Helper to decrease size by 15%
 const scale = (value: number) => value * 0.80;
-
-const ProfileHeader: React.FC = () => {
+const ProfileHeader: React.FC<{ userProfile?: UserProfile }> = ({ userProfile = mockUserProfile }) => {
   return (
     <Box sx={{ 
       display: 'flex', 
@@ -24,14 +23,14 @@ const ProfileHeader: React.FC = () => {
       {/* Profile Avatar with Verification Badge */}
       <Box sx={{ position: 'relative', mt: scale(-1) }}>
         <Avatar
-          src={mockUserProfile.avatar}
+          src={`http://localhost:3001/api/avatar?url=${encodeURIComponent(userProfile.avatar)}`}
           sx={{ 
             width: scale(180),
             height: scale(180),
             border: `${scale(4)}px solid #007AFF`
           }}
         />
-        {mockUserProfile.isVerified && (
+        {userProfile.isVerified && (
           <Box sx={{
             position: 'absolute',
             bottom: scale(2),
@@ -62,7 +61,7 @@ const ProfileHeader: React.FC = () => {
             fontSize: scale(34) // default h4 is 2.125rem = 34px
           }}
         >
-          {mockUserProfile.name}
+          {userProfile.name}
         </Typography>
         
         <Typography 
@@ -73,7 +72,7 @@ const ProfileHeader: React.FC = () => {
             fontSize: scale(18.4) // 1.15rem = 18.4px
           }}
         >
-          {mockUserProfile.username}
+          {userProfile.username}
         </Typography>
 
         {/* Stats Row with decreased spacing */}
@@ -88,7 +87,7 @@ const ProfileHeader: React.FC = () => {
                 lineHeight: 1
               }}
             >
-              {mockUserProfile.followers}
+              {userProfile.followers}
             </Typography>
             <Typography 
               variant="caption" 
@@ -112,7 +111,7 @@ const ProfileHeader: React.FC = () => {
                 lineHeight: 1
               }}
             >
-              {mockUserProfile.following}
+              {userProfile.following}
             </Typography>
             <Typography 
               variant="caption" 
@@ -136,7 +135,7 @@ const ProfileHeader: React.FC = () => {
                 lineHeight: 1
               }}
             >
-              {mockUserProfile.posts}
+              {userProfile.posts}
             </Typography>
             <Typography 
               variant="caption" 
