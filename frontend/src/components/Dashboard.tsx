@@ -19,6 +19,8 @@ import Sidebar from './Sidebar';
 import Header from './Header';
 import { UserProfile, ContentPost, ReelData, MetricCard } from '../types/dashboard';
 
+const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:3001';
+
 const Dashboard: React.FC = () => {
   const [activeTab, setActiveTab] = useState(0);
   const [activeSection, setActiveSection] = useState('dashboard');
@@ -41,9 +43,9 @@ const Dashboard: React.FC = () => {
     setLoading(true);
     try {
       const [userResponse, postsResponse, metricsResponse] = await Promise.all([
-        fetch(`http://localhost:3001/api/user/${username}`),
-        fetch(`http://localhost:3001/api/posts/${username}`),
-        fetch(`http://localhost:3001/api/metrics/${username}`)
+        fetch(`${API_BASE_URL}/api/user/${username}`),
+        fetch(`${API_BASE_URL}/api/posts/${username}`),
+        fetch(`${API_BASE_URL}/api/metrics/${username}`)
       ]);
 
       const userData = userResponse.ok ? await userResponse.json() : undefined;
@@ -70,9 +72,9 @@ const Dashboard: React.FC = () => {
     setLoading(true);
     try {
       const [userResponse, postsResponse, metricsResponse] = await Promise.all([
-        fetch(`http://localhost:3001/api/user/${userProfile.username}?refresh=true`),
-        fetch(`http://localhost:3001/api/posts/${userProfile.username}?refresh=true`),
-        fetch(`http://localhost:3001/api/metrics/${userProfile.username}?refresh=true`)
+        fetch(`${API_BASE_URL}/api/user/${userProfile.username}?refresh=true`),
+        fetch(`${API_BASE_URL}/api/posts/${userProfile.username}?refresh=true`),
+        fetch(`${API_BASE_URL}/api/metrics/${userProfile.username}?refresh=true`)
       ]);
 
       const userData = userResponse.ok ? await userResponse.json() : undefined;

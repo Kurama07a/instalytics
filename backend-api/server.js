@@ -7,7 +7,9 @@ const https = require('https');
 const sqlite3 = require('sqlite3').verbose();
 
 const app = express();
-const PORT = 3001;
+const PORT = process.env.PORT || 3001;
+const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:3000';
+const BASE_URL = process.env.BASE_URL || 'http://localhost:3001';
 
 const db = new sqlite3.Database(path.join(__dirname, 'instalytics.db'));
 
@@ -89,7 +91,7 @@ function abbreviateNumber(num) {
     }
 }
 
-app.use(cors({ origin: 'http://localhost:3000' }));
+app.use(cors({ origin: FRONTEND_URL }));
 app.use(express.json());
 
 app.get('/api/user/:username', (req, res) => {
@@ -302,7 +304,7 @@ app.get('/api/posts/:username', (req, res) => {
                                     // Map new posts
                                     const newPosts = (analyzedResult.images || []).map((img, index) => ({
                                         id: img.id || `post-${Date.now()}-${index}`,
-                                        image: `http://localhost:3001/api/avatar?url=${encodeURIComponent(img.src)}`,
+                                        image: `${BASE_URL}/api/avatar?url=${encodeURIComponent(img.src)}`,
                                         likes: abbreviateNumber(img.likes || 0),
                                         comments: abbreviateNumber(img.comments_count || 0),
                                         title: img.title || '',
@@ -318,7 +320,7 @@ app.get('/api/posts/:username', (req, res) => {
                                     }));
                                     const newReels = (analyzedResult.videos || []).map((vid, index) => ({
                                         id: vid.id || `reel-${Date.now()}-${index}`,
-                                        thumbnail: `http://localhost:3001/api/avatar?url=${encodeURIComponent(vid.thumb)}`,
+                                        thumbnail: `${BASE_URL}/api/avatar?url=${encodeURIComponent(vid.thumb)}`,
                                         videoSrc: vid.url || undefined,
                                         title: vid.title || '',
                                         caption: vid.captions ? vid.captions.join(' ') : '',
@@ -544,7 +546,7 @@ app.get('/api/posts/:username', (req, res) => {
                                         // Map using analyzedResult
                                         const posts = (analyzedResult.images || []).map((img, index) => ({
                                             id: img.id || `post-${index}`,
-                                            image: `http://localhost:3001/api/avatar?url=${encodeURIComponent(img.src)}`,
+                                            image: `${BASE_URL}/api/avatar?url=${encodeURIComponent(img.src)}`,
                                             likes: abbreviateNumber(img.likes || 0),
                                             comments: abbreviateNumber(img.comments_count || 0),
                                             title: img.title || '',
@@ -560,7 +562,7 @@ app.get('/api/posts/:username', (req, res) => {
                                         }));
                                         const reels = (analyzedResult.videos || []).map((vid, index) => ({
                                             id: vid.id || `reel-${index}`,
-                                            thumbnail: `http://localhost:3001/api/avatar?url=${encodeURIComponent(vid.thumb)}`,
+                                            thumbnail: `${BASE_URL}/api/avatar?url=${encodeURIComponent(vid.thumb)}`,
                                             videoSrc: vid.url || undefined,
                                             title: vid.title || '',
                                             caption: vid.captions ? vid.captions.join(' ') : '',
@@ -816,7 +818,7 @@ app.get('/api/metrics/:username', (req, res) => {
     }
 });
 
-app.listen(PORT, () => {
+app.listen(PORT, '0.0.0.0', () => {
     console.log(`Server running on port ${PORT}`);
 });
 

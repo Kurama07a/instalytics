@@ -9,6 +9,9 @@ import {
 } from '@mui/material';
 import { Verified, Refresh } from '@mui/icons-material';
 import { UserProfile } from '../types/dashboard';
+
+const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:3001';
+
 // Helper to decrease size by 15%
 const scale = (value: number) => value * 0.80;
 const ProfileHeader: React.FC<{ userProfile?: UserProfile; onRefresh?: () => void }> = ({ userProfile, onRefresh }) => {
@@ -57,7 +60,7 @@ const ProfileHeader: React.FC<{ userProfile?: UserProfile; onRefresh?: () => voi
       {/* Profile Avatar with Verification Badge */}
       <Box sx={{ position: 'relative', mt: scale(-1) }}>
         <Avatar
-          src={`http://localhost:3001/api/avatar?url=${encodeURIComponent(userProfile.avatar)}`}
+          src={`${API_BASE_URL}/api/avatar?url=${encodeURIComponent(userProfile.avatar)}`}
           sx={{ 
             width: scale(180),
             height: scale(180),
