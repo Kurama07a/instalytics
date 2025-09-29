@@ -91,7 +91,7 @@ function abbreviateNumber(num) {
     }
 }
 
-app.use(cors({ origin: FRONTEND_URL }));
+app.use(cors({ origin: '*'}));
 app.use(express.json());
 
 app.get('/api/user/:username', (req, res) => {
@@ -101,8 +101,8 @@ app.get('/api/user/:username', (req, res) => {
     if (refresh) {
         // Always fetch
         // Path to the Python script
-        const scriptPath = path.join(__dirname, '..', 'backend', 'tut2.py');
-        const cookiesPath = path.join(__dirname, '..', 'backend', 'cookies.json');
+        const scriptPath = path.join(__dirname, '..', 'scraping', 'scrape.py');
+        const cookiesPath = path.join(__dirname, '..', 'scraping', 'cookies.json');
 
         // Build arguments
         const args = [scriptPath, username, '--no-pretty'];
@@ -175,8 +175,8 @@ app.get('/api/user/:username', (req, res) => {
             } else {
                 // Fetch and store
                 // Same as above
-                const scriptPath = path.join(__dirname, '..', 'backend', 'tut2.py');
-                const cookiesPath = path.join(__dirname, '..', 'backend', 'cookies.json');
+                const scriptPath = path.join(__dirname, '..', 'scraping', 'scrape.py');
+                const cookiesPath = path.join(__dirname, '..', 'scraping', 'cookies.json');
 
                 const args = [scriptPath, username, '--no-pretty'];
                 if (fs.existsSync(cookiesPath)) {
@@ -245,8 +245,8 @@ app.get('/api/posts/:username', (req, res) => {
             const existingIds = new Set(existingPosts.map(p => p.id));
 
             // Path to the Python script
-            const scriptPath = path.join(__dirname, '..', 'backend', 'tut2.py');
-            const cookiesPath = path.join(__dirname, '..', 'backend', 'cookies.json');
+            const scriptPath = path.join(__dirname, '..', 'sracping', 'scrape.py');
+            const cookiesPath = path.join(__dirname, '..', 'scraping', 'cookies.json');
 
             // Build arguments
             const args = [scriptPath, username, '--no-pretty'];
@@ -282,7 +282,7 @@ app.get('/api/posts/:username', (req, res) => {
                         fs.writeFileSync(tempFile, JSON.stringify(newResult));
                         
                         // Run analyze_posts.py
-                        const analyzePath = path.join(__dirname, '..', 'backend', 'analyze_posts.py');
+                        const analyzePath = path.join(__dirname, '..', 'scraping', 'analyze_posts.py');
                         const analyze = spawn('python3', [analyzePath, tempFile], { cwd: path.join(__dirname, '..') });
                         
                         let analyzedData = '';
@@ -494,8 +494,8 @@ app.get('/api/posts/:username', (req, res) => {
             } else {
                 // Fetch and store all
                 // Same as refresh but without filtering
-                const scriptPath = path.join(__dirname, '..', 'backend', 'tut2.py');
-                const cookiesPath = path.join(__dirname, '..', 'backend', 'cookies.json');
+                const scriptPath = path.join(__dirname, '..', 'scraping', 'scrape.py');
+                const cookiesPath = path.join(__dirname, '..', 'scraping', 'cookies.json');
 
                 const args = [scriptPath, username, '--no-pretty'];
                 if (fs.existsSync(cookiesPath)) {
@@ -524,7 +524,7 @@ app.get('/api/posts/:username', (req, res) => {
                             fs.writeFileSync(tempFile, JSON.stringify(result));
                             
                             // Run analyze_posts.py
-                            const analyzePath = path.join(__dirname, '..', 'backend', 'analyze_posts.py');
+                            const analyzePath = path.join(__dirname, '..', 'scraping', 'analyze_posts.py');
                             const analyze = spawn('python3', [analyzePath, tempFile], { cwd: path.join(__dirname, '..') });
                             
                             let analyzedData = '';
@@ -627,8 +627,8 @@ app.get('/api/metrics/:username', (req, res) => {
     if (refresh) {
         // Always fetch
         // Path to the Python script
-        const scriptPath = path.join(__dirname, '..', 'backend', 'tut2.py');
-        const cookiesPath = path.join(__dirname, '..', 'backend', 'cookies.json');
+        const scriptPath = path.join(__dirname, '..', 'scraping', 'scrape.py');
+        const cookiesPath = path.join(__dirname, '..', 'scraping', 'cookies.json');
 
         // Build arguments
         const args = [scriptPath, username, '--no-pretty'];
@@ -739,8 +739,8 @@ app.get('/api/metrics/:username', (req, res) => {
             } else {
                 // Fetch and store
                 // Same as above
-                const scriptPath = path.join(__dirname, '..', 'backend', 'tut2.py');
-                const cookiesPath = path.join(__dirname, '..', 'backend', 'cookies.json');
+                const scriptPath = path.join(__dirname, '..', 'scraping', 'scrape.py');
+                const cookiesPath = path.join(__dirname, '..', 'scraping', 'cookies.json');
 
                 const args = [scriptPath, username, '--no-pretty'];
                 if (fs.existsSync(cookiesPath)) {
@@ -818,7 +818,7 @@ app.get('/api/metrics/:username', (req, res) => {
     }
 });
 
-app.listen(PORT, '0.0.0.0', () => {
+app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
 });
 
