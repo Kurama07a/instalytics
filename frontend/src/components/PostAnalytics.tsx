@@ -13,25 +13,24 @@ import {
 } from '@mui/material';
 import { TrendingUp, Visibility, Share, BookmarkBorder, Favorite, ChatBubbleOutline, Star, Lightbulb, Palette, Close, ArrowBack, ArrowForward } from '@mui/icons-material';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line } from 'recharts';
-import { ContentPost, ReelData, PostAnalytics as PostAnalyticsType } from '../types/dashboard';
+import { ContentPost, ReelData } from '../types/dashboard';
 
 interface PostAnalyticsProps {
-  analytics: PostAnalyticsType;
   content: ContentPost | ReelData;
   onClose?: () => void;
   onPrev?: () => void;
   onNext?: () => void;
 }
 
-const PostAnalytics: React.FC<PostAnalyticsProps> = ({ analytics, content, onClose, onPrev, onNext }) => {
+const PostAnalytics: React.FC<PostAnalyticsProps> = ({ content, onClose, onPrev, onNext }) => {
   const [tabValue, setTabValue] = useState(0);
 
   if (!content) {
     // Show overview when no content is provided
     return (
       <Box className="glass-card" sx={{ 
-        bgcolor: 'transparent', // Override with glass effect
-        border: 'none', // Override with glass effect
+        bgcolor: 'transparent', 
+        border: 'none', 
         borderRadius: 2,
         p: 3,
         height: 400,
@@ -189,31 +188,39 @@ const PostAnalytics: React.FC<PostAnalyticsProps> = ({ analytics, content, onClo
 
       {/* Content Preview and Metrics */}
       <Box sx={{ display: 'flex', gap: 3, mb: 3 }}>
-        <Box 
-          component="img"
-          src={isReel ? content.thumbnail : content.image}
-          sx={{ 
-            width: 300, 
-            height: 300, 
-            borderRadius: 1,
-            objectFit: 'cover',
-            flexShrink: 0
-          }}
-        />
-        <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 2 }}>
+        {isReel ? (
+          <video
+            src={content.videoSrc || content.thumbnail}
+            controls
+            style={{ width: 400, height: 400, borderRadius: 8, objectFit: 'contain', flexShrink: 0 }}
+          />
+        ) : (
+          <Box
+            component="img"
+            src={content.image}
+            sx={{
+              width: 400,
+              height: 400,
+              borderRadius: 1,
+              objectFit: 'contain',
+              flexShrink: 0
+            }}
+          />
+        )}
+        <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 1 }}>
           <Typography 
             variant="body1" 
             sx={{ 
               color: 'white', 
               fontWeight: 600, 
-              mb: 1,
+              mb: 0.5,
               fontSize: '1rem'
             }}
           >
             {content.title}
           </Typography>
-          <Typography variant="caption" sx={{ color: '#888', mb: 2 }}>
-            {content.timestamp}
+          <Typography variant="body2" sx={{ color: '#ccc', mb: 1.5, fontFamily: 'Roboto', fontSize: '0.9rem' }}>
+            {content.caption}
           </Typography>
 
           {/* Metrics Cards */}
@@ -269,8 +276,7 @@ const PostAnalytics: React.FC<PostAnalyticsProps> = ({ analytics, content, onClo
           value={tabValue} 
           onChange={(_, newValue) => setTabValue(newValue)}
           sx={{ 
-            borderBottom: 1, 
-            borderColor: '#333',
+            borderBottom: '1px solid #333',
             '& .MuiTab-root': { color: '#888', fontSize: '0.9rem' },
             '& .Mui-selected': { color: 'white' },
             '& .MuiTabs-indicator': { bgcolor: '#007AFF' }
@@ -286,81 +292,66 @@ const PostAnalytics: React.FC<PostAnalyticsProps> = ({ analytics, content, onClo
         {tabValue === 0 && (
           <Box sx={{ mt: 3 }}>
             <Typography variant="subtitle2" sx={{ color: 'white', mb: 2, fontWeight: 600 }}>
-              Keywords:
+              Top Categories:
             </Typography>
             <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, mb: 3 }}>
-              {analytics.keywords.map((keyword, index) => (
-                <Chip key={index} label={keyword} variant="outlined" sx={{ color: 'white', borderColor: '#555' }} />
-              ))}
+              {content.categories?.slice(0, 5).map((category, index) => (
+                <Chip key={index} label={`${category.name} (${(category.confidence * 100).toFixed(1)}%)`} variant="outlined" sx={{ color: 'white', borderColor: '#555' }} />
+              )) || []}
             </Box>
             <Typography variant="subtitle2" sx={{ color: 'white', mb: 2, fontWeight: 600 }}>
-              Top Comments:
+              Vibe:
             </Typography>
             <Box sx={{ mb: 3 }}>
-              {analytics.topComments.map((comment, index) => (
-                <Typography key={index} variant="body2" sx={{ color: '#ccc', mb: 1 }}>
-                  "{comment.comment}" by {comment.user} ({comment.likes} likes)
-                </Typography>
-              ))}
+              <Chip label={content.vibe} sx={{ bgcolor: '#007AFF', color: 'white' }} />
             </Box>
           </Box>
         )}
 
-        {/* Engagement Tab */}
+        {/* Engagement Tab - Placeholder */}
         {tabValue === 1 && (
-          <Box sx={{ mt: 3 }}>
-            <Typography variant="subtitle2" sx={{ color: 'white', mb: 2, fontWeight: 600 }}>
-              Engagement Breakdown:
+          <Box sx={{ mt: 3, textAlign: 'center', py: 4 }}>
+            <Typography variant="body1" sx={{ color: '#888' }}>
+              Engagement analytics not available
             </Typography>
-            <ResponsiveContainer width="100%" height={200}>
-              <BarChart data={analytics.engagementBreakdown}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#333" />
-                <XAxis dataKey="type" stroke="#888" fontSize={12} />
-                <YAxis stroke="#888" fontSize={12} />
-                <Tooltip contentStyle={{ backgroundColor: '#0a0a0a', border: '1px solid #333', borderRadius: 4 }} labelStyle={{ color: 'white' }} />
-                <Bar dataKey="count" fill="#007AFF" />
-              </BarChart>
-            </ResponsiveContainer>
-            <Typography variant="subtitle2" sx={{ color: 'white', mb: 2, mt: 4, fontWeight: 600 }}>
-              Views Trend:
-            </Typography>
-            <ResponsiveContainer width="100%" height={200}>
-              <LineChart data={analytics.viewsTrend}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#333" />
-                <XAxis dataKey="time" stroke="#888" fontSize={12} />
-                <YAxis stroke="#888" fontSize={12} />
-                <Tooltip contentStyle={{ backgroundColor: '#0a0a0a', border: '1px solid #333', borderRadius: 4 }} labelStyle={{ color: 'white' }} />
-                <Line type="monotone" dataKey="views" stroke="#007AFF" strokeWidth={2} />
-              </LineChart>
-            </ResponsiveContainer>
           </Box>
         )}
 
         {/* Quality Tab */}
-        {tabValue === 2 && analytics.quality && (
+        {tabValue === 2 && content.quality && (
           <Box sx={{ mt: 3 }}>
             <Typography variant="subtitle2" sx={{ color: 'white', mb: 2, fontWeight: 600 }}>
-              Quality Analysis:
+              Image Quality Parameters:
             </Typography>
-            <Typography variant="body2" sx={{ color: '#ccc' }}>
-              Lighting: {analytics.quality.lighting}/10<br />
-              Visual Appeal: {analytics.quality.visualAppeal}/10<br />
-              Consistency: {analytics.quality.consistency}/10
-            </Typography>
+            <ResponsiveContainer width="100%" height={300}>
+              <BarChart data={[
+                { name: 'Lighting', value: Math.round((content.quality.category?.lighting || 0) * 100) },
+                { name: 'Contrast', value: Math.round((content.quality.category?.contrast || 0) * 100) },
+                { name: 'Saturation', value: Math.round((content.quality.category?.saturation || 0) * 100) },
+                { name: 'Sharpness', value: Math.round((content.quality.category?.sharpness || 0) * 100) },
+                { name: 'Colorfulness', value: Math.round((content.quality.category?.colorfulness || 0) * 100) },
+                { name: 'Exposure', value: Math.round((content.quality.category?.exposure || 0) * 100) },
+              ]}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#444" />
+                <XAxis dataKey="name" stroke="#fff" />
+                <YAxis stroke="#fff" />
+                <Tooltip 
+                  contentStyle={{ backgroundColor: 'rgba(0,0,0,0.8)', border: '1px solid #fff', borderRadius: 4 }}
+                  labelStyle={{ color: '#fff' }}
+                  itemStyle={{ color: '#00FF88' }}
+                />
+                <Bar dataKey="value" fill="#00FF88" />
+              </BarChart>
+            </ResponsiveContainer>
           </Box>
         )}
 
-        {/* Events Tab (Reels only) */}
-        {tabValue === 3 && isReel && content.events && (
-          <Box sx={{ mt: 3 }}>
-            <Typography variant="subtitle2" sx={{ color: 'white', mb: 2, fontWeight: 600 }}>
-              Detected Events:
+        {/* Events Tab - Only for Reels */}
+        {tabValue === 3 && isReel && (
+          <Box sx={{ mt: 3, textAlign: 'center', py: 4 }}>
+            <Typography variant="body1" sx={{ color: '#888' }}>
+              Events analytics not available
             </Typography>
-            <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
-              {content.events.map((event, index) => (
-                <Chip key={index} label={event} variant="outlined" sx={{ color: 'white', borderColor: '#555' }} />
-              ))}
-            </Box>
           </Box>
         )}
       </Box>

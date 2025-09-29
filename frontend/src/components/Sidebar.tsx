@@ -26,11 +26,6 @@ interface SidebarProps {
 const Sidebar: React.FC<SidebarProps> = ({ activeSection, onSectionChange }) => {
   const menuItems = [
     { id: 'dashboard', label: 'Dashboard', icon: <DashboardIcon /> },
-    { id: 'posts', label: 'Posts', icon: <PhotoLibrary /> },
-    { id: 'reels', label: 'Reels', icon: <Videocam /> },
-    { id: 'analytics', label: 'Analytics', icon: <Analytics /> },
-    { id: 'profile', label: 'Profile', icon: <Person /> },
-    { id: 'settings', label: 'Settings', icon: <Settings /> }
   ];
 
   return (

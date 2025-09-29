@@ -18,15 +18,14 @@ import ContentFeed from './ContentFeed';
 import Sidebar from './Sidebar';
 import Header from './Header';
 import { UserProfile, ContentPost, ReelData, MetricCard } from '../types/dashboard';
-import { mockUserProfile, mockContentPosts, mockReelData, mockMetrics } from '../data/mockData';
 
 const Dashboard: React.FC = () => {
   const [activeTab, setActiveTab] = useState(0);
   const [activeSection, setActiveSection] = useState('dashboard');
-  const [userProfile, setUserProfile] = useState<UserProfile>(mockUserProfile);
-  const [posts, setPosts] = useState<ContentPost[]>(mockContentPosts);
-  const [reels, setReels] = useState<ReelData[]>(mockReelData);
-  const [metrics, setMetrics] = useState<MetricCard[]>(mockMetrics);
+  const [userProfile, setUserProfile] = useState<UserProfile | undefined>(undefined);
+  const [posts, setPosts] = useState<ContentPost[]>([]);
+  const [reels, setReels] = useState<ReelData[]>([]);
+  const [metrics, setMetrics] = useState<MetricCard[]>([]);
   const [loading, setLoading] = useState(false);
 
   const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
@@ -47,9 +46,9 @@ const Dashboard: React.FC = () => {
         fetch(`http://localhost:3001/api/metrics/${username}`)
       ]);
 
-      const userData = userResponse.ok ? await userResponse.json() : mockUserProfile;
+      const userData = userResponse.ok ? await userResponse.json() : undefined;
       const postsData = postsResponse.ok ? await postsResponse.json() : { posts: [], reels: [] };
-      const metricsData = metricsResponse.ok ? await metricsResponse.json() : mockMetrics;
+      const metricsData = metricsResponse.ok ? await metricsResponse.json() : [];
 
       setUserProfile(userData);
       setPosts(postsData.posts || []);
@@ -57,7 +56,35 @@ const Dashboard: React.FC = () => {
       setMetrics(metricsData);
     } catch (error) {
       console.error('Error fetching data:', error);
-      // Keep mock data if fetch fails
+      setUserProfile(undefined);
+      setPosts([]);
+      setReels([]);
+      setMetrics([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleRefresh = async () => {
+    if (!userProfile) return;
+    setLoading(true);
+    try {
+      const [userResponse, postsResponse, metricsResponse] = await Promise.all([
+        fetch(`http://localhost:3001/api/user/${userProfile.username}?refresh=true`),
+        fetch(`http://localhost:3001/api/posts/${userProfile.username}?refresh=true`),
+        fetch(`http://localhost:3001/api/metrics/${userProfile.username}?refresh=true`)
+      ]);
+
+      const userData = userResponse.ok ? await userResponse.json() : undefined;
+      const postsData = postsResponse.ok ? await postsResponse.json() : { posts: [], reels: [] };
+      const metricsData = metricsResponse.ok ? await metricsResponse.json() : [];
+
+      setUserProfile(userData);
+      setPosts(postsData.posts || []);
+      setReels(postsData.reels || []);
+      setMetrics(metricsData);
+    } catch (error) {
+      console.error('Error refreshing data:', error);
     } finally {
       setLoading(false);
     }
@@ -100,9 +127,9 @@ const Dashboard: React.FC = () => {
                 {/* Left Column - Dashboard */}
                 <Grid item xs={12} lg={6}>
                   <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3, height: '100%', marginTop: 2 }}>
-                    <ProfileHeader userProfile={userProfile} />
+                    <ProfileHeader userProfile={userProfile} onRefresh={handleRefresh} />
                     <KeyMetrics metrics={metrics} />
-                    <ContentVibe />
+                    <ContentVibe posts={posts} reels={reels} />
                     <AudienceDemographics />
                   </Box>
                 </Grid>

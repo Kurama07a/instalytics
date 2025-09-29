@@ -1,8 +1,9 @@
-import json
 import httpx
+import json
 import logging
 import logging.handlers
 import argparse
+import random
 import sys
 import time
 from pathlib import Path
@@ -19,6 +20,15 @@ def load_cookies(cookies_file: str) -> dict:
     except Exception as e:
         logger.error("Failed to load cookies from %s: %s", cookies_file, e)
         return {}
+
+def load_user_agents(file_path: str) -> list[str]:
+    """Load user agents from a text file, one per line."""
+    try:
+        with open(file_path, 'r') as f:
+            return [line.strip() for line in f if line.strip()]
+    except Exception as e:
+        logger.error("Failed to load user agents from %s: %s", file_path, e)
+        return []
 
 def setup_logger(name="tut1", log_file: str | None = None, level=logging.INFO):
     logger = logging.getLogger(name)
@@ -45,6 +55,8 @@ def setup_logger(name="tut1", log_file: str | None = None, level=logging.INFO):
 
 logger = setup_logger()
 
+USER_AGENTS = load_user_agents("useragents.txt")
+
 def scrape_user(username: str, attempts: int = 3, backoff: float = 1.0, cookies: dict = None):
     """Scrape Instagram user's data. Returns a dict on success."""
     client_kwargs = {
@@ -52,10 +64,12 @@ def scrape_user(username: str, attempts: int = 3, backoff: float = 1.0, cookies:
             # this is internal ID of an Instagram backend app. It doesn't change often.
             "x-ig-app-id": "936619743392459",
             # use browser-like features
-            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/62.0.3202.94 Safari/537.36",
+            "User-Agent": random.choice(USER_AGENTS) if USER_AGENTS else "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/62.0.3202.94 Safari/537.36",
             "Accept-Language": "en-US,en;q=0.9,ru;q=0.8",
             "Accept-Encoding": "gzip, deflate, br",
             "Accept": "*/*",
+            "X-Requested-With": "XMLHttpRequest",
+            "Referer": f"https://www.instagram.com/",
         },
         "timeout": 10.0,
     }

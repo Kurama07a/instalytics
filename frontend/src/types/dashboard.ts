@@ -52,16 +52,26 @@ export interface ContentPost {
   timestamp: string;
   keywords: string[];
   vibe: string;
+  categories: { name: string; confidence: number }[];
   quality: {
-    lighting: number;
-    visualAppeal: number;
-    consistency: number;
+    score: number;
+    category: {
+      lighting: number;
+      contrast: number;
+      saturation: number;
+      sharpness: number;
+      colorfulness: number;
+      exposure: number;
+    };
   };
+  hashtags: string[];
+  mentions: string[];
 }
 
 export interface ReelData {
   id: string;
   thumbnail: string;
+  videoSrc?: string;
   title: string;
   caption: string;
   views: string;
@@ -71,11 +81,24 @@ export interface ReelData {
   events: string[];
   vibe: string;
   tags: string[];
+  categories: { name: string; confidence: number }[];
+  quality: {
+    score: number;
+    category: {
+      lighting: number;
+      contrast: number;
+      saturation: number;
+      sharpness: number;
+      colorfulness: number;
+      exposure: number;
+    };
+  };
+  hashtags: string[];
+  mentions: string[];
   engagementBreakdown?: {};
   topComments?: {};
   viewsTrend?: {};
   keywords?: {};
-quality? : {};
 }
 
 export interface PostAnalytics {

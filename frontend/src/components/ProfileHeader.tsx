@@ -4,14 +4,48 @@ import {
   Typography, 
   Avatar, 
   Stack,
-  Chip
+  Chip,
+  IconButton
 } from '@mui/material';
-import { Verified } from '@mui/icons-material';
-import { mockUserProfile } from '../data/mockData';
+import { Verified, Refresh } from '@mui/icons-material';
 import { UserProfile } from '../types/dashboard';
 // Helper to decrease size by 15%
 const scale = (value: number) => value * 0.80;
-const ProfileHeader: React.FC<{ userProfile?: UserProfile }> = ({ userProfile = mockUserProfile }) => {
+const ProfileHeader: React.FC<{ userProfile?: UserProfile; onRefresh?: () => void }> = ({ userProfile, onRefresh }) => {
+  if (!userProfile) {
+    return (
+      <Box sx={{ 
+        display: 'flex', 
+        alignItems: 'flex-start',
+        gap: scale(3),
+        mb: scale(2),
+        p: scale(3),
+        bgcolor: '#1a1a1a',
+        borderRadius: 2,
+      }}>
+        <Box sx={{ position: 'relative', mt: scale(-1) }}>
+          <Box
+            sx={{ 
+              width: scale(180),
+              height: scale(180),
+              borderRadius: '50%',
+              bgcolor: '#333',
+            }}
+          />
+        </Box>
+        <Box sx={{ flex: 1 }}>
+          <Box sx={{ height: 24, bgcolor: '#333', borderRadius: 1, mb: 1 }} />
+          <Box sx={{ height: 16, bgcolor: '#333', borderRadius: 1, mb: 1, width: '60%' }} />
+          <Stack direction="row" spacing={2} sx={{ mt: scale(2) }}>
+            {[1,2,3,4].map((i) => (
+              <Box key={i} sx={{ height: 20, bgcolor: '#333', borderRadius: 1, width: 60 }} />
+            ))}
+          </Stack>
+        </Box>
+      </Box>
+    );
+  }
+
   return (
     <Box sx={{ 
       display: 'flex', 
@@ -64,16 +98,29 @@ const ProfileHeader: React.FC<{ userProfile?: UserProfile }> = ({ userProfile = 
           {userProfile.name}
         </Typography>
         
-        <Typography 
-          variant="body1" 
-          sx={{ 
-            color: '#888',
-            mb: scale(3),
-            fontSize: scale(18.4) // 1.15rem = 18.4px
-          }}
-        >
-          {userProfile.username}
-        </Typography>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: scale(3) }}>
+          <Typography 
+            variant="body1" 
+            sx={{ 
+              color: '#888',
+              fontSize: scale(18.4) // 1.15rem = 18.4px
+            }}
+          >
+            {userProfile.username}
+          </Typography>
+          {onRefresh && (
+            <IconButton 
+              onClick={onRefresh}
+              sx={{ 
+                color: '#007AFF',
+                '&:hover': { bgcolor: 'rgba(0, 122, 255, 0.1)' }
+              }}
+              size="small"
+            >
+              <Refresh fontSize="small" />
+            </IconButton>
+          )}
+        </Box>
 
         {/* Stats Row with decreased spacing */}
         <Stack direction="row" spacing={scale(15)} alignItems="center">
