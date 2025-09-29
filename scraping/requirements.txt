@@ -1,0 +1,7 @@
+requests
+Pillow
+numpy
+transformers
+torch
+httpx
+jmespath
