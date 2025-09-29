@@ -28,7 +28,7 @@ const Header: React.FC<{ onSearch?: (username: string) => void }> = ({ onSearch 
     }}>
       <Toolbar sx={{ minHeight: '64px' }}>
         <Typography variant="h6" sx={{ flexGrow: 1, fontWeight: 700, color: '#FFFFFF' }}>
-          InstaAnalytics
+          InstaLytics
         </Typography>
         
         <Box sx={{ 

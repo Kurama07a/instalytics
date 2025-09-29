@@ -46,7 +46,7 @@ const Sidebar: React.FC<SidebarProps> = ({ activeSection, onSectionChange }) => 
     >
       <Box sx={{ p: 2 }}>
         <Typography variant="h6" sx={{ color: 'white', fontWeight: 700 }}>
-          InstaAnalytics
+          InstaLytics
         </Typography>
       </Box>
       <Divider sx={{ bgcolor: '#333' }} />
